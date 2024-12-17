@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { logger } from '@/lib/logger'
 import { NFT } from '@/app/types/nft'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, PublicKeyInitData } from '@solana/web3.js'
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { userId: string } }
 ) {
   try {
@@ -30,7 +30,7 @@ export async function GET(
       },
     })
 
-    const formattedUnstakedNFTs: NFT[] = unstakedNFTs.map((nft) => ({
+    const formattedUnstakedNFTs: NFT[] = unstakedNFTs.map((nft: { owner: PublicKeyInitData }) => ({
       ...nft,
       owner: new PublicKey(nft.owner),
     }))

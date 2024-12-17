@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     )
 
     // Start a Prisma transaction
-    const updatedNFT = await prisma.$transaction(async (prisma) => {
+    const updatedNFT = await prisma.$transaction(async (prisma: { nFT: { update: (arg0: { where: { id: string }; data: { ownerId: any; isListed: boolean } }) => any }; user: { update: (arg0: { where: { id: any } | { id: any }; data: { balance: { decrement: any } } | { balance: { increment: any } } }) => any }; transaction: { create: (arg0: { data: { nftId: any; sellerId: any; buyerId: any; price: any; transactionSignature: string } }) => any } }) => {
       // Update the NFT ownership in the database
       const updatedNFT = await prisma.nFT.update({
         where: { id: nftId },

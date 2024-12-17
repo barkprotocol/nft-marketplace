@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletConnection } from '@/hooks/use-wallet-connection'
-import { getProgram, mintNFT, purchaseNFT } from '@/app/utils/anchor'
+import { getProgram, mintNFT } from '@/app/utils/anchor'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Plus, Loader2 } from 'lucide-react'
-import { NFTCard } from '@/components/ui/layout/nft-cards'
+import { NFTCard } from '@/components/ui/layout/nft-card'
 import { logger } from '@/lib/logger'
 
 interface NFT {
@@ -27,11 +27,7 @@ export default function Marketplace() {
   const anchorWallet = useAnchorWallet()
   const { toast } = useToast()
 
-  useEffect(() => {
-    fetchNFTs()
-  }, [])
-
-  const fetchNFTs = async () => {
+  const fetchNFTs = useCallback(async () => {
     setIsLoading(true)
     try {
       const response = await fetch('/api/nfts')
@@ -50,7 +46,11 @@ export default function Marketplace() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    fetchNFTs()
+  }, [fetchNFTs])
 
   const handleBuy = async (nftId: string) => {
     if (!connected || !publicKey) {
@@ -148,8 +148,8 @@ export default function Marketplace() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4 text-black dark:text-white">NFT Marketplace</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400">
+        <h1 className="text-4xl font-bold mb-4 text-primary">NFT Marketplace</h1>
+        <p className="text-xl text-muted-foreground">
           Discover, buy, and collect unique digital assets on the BARK NFT Marketplace
         </p>
       </div>
@@ -171,7 +171,7 @@ export default function Marketplace() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {nfts.slice(0, 8).map((nft) => (
+        {nfts.map((nft) => (
           <NFTCard
             key={nft.id}
             id={nft.id}

@@ -6,7 +6,7 @@ import { z } from 'zod'
 const userIdSchema = z.string().uuid()
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { userId: string } }
 ) {
   try {
@@ -34,7 +34,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: transactions.map(tx => ({
+      data: transactions.map((tx: { id: any; buyerId: string; nft: { name: any; image: any }; price: any; timestamp: any; transactionSignature: any }) => ({
         id: tx.id,
         type: tx.buyerId === userId ? 'purchase' : 'sale',
         nftName: tx.nft.name,
