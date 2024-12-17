@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
 
-declare_id!("Er8eAGu5j9fV5dUgRJnAzwKtAWvmovjNuyEvdUJrvXet");
+declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
 pub mod bark_nft {
@@ -84,4 +84,3 @@ pub struct PurchaseNFT<'info> {
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
 }
-

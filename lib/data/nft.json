@@ -1,0 +1,49 @@
+{
+    "name": "BARK #001",
+    "description": "A unique BARK NFT from the BARK NFT Marketplace collection.",
+    "image": "https://example.com/images/bark-001.png",
+    "external_url": "https://bark-nft-marketplace.com/nft/001",
+    "animation_url": "https://example.com/animations/bark-001.mp4",
+    "background_color": "1E1E1E",
+    "attributes": [
+      {
+        "trait_type": "Rarity",
+        "value": "Legendary"
+      },
+      {
+        "trait_type": "Element",
+        "value": "Fire"
+      },
+      {
+        "trait_type": "Power Level",
+        "value": 95,
+        "display_type": "number"
+      },
+      {
+        "trait_type": "Birthday",
+        "value": 1640995200000,
+        "display_type": "date"
+      }
+    ],
+    "properties": {
+      "files": [
+        {
+          "uri": "https://example.com/images/bark-001.png",
+          "type": "image/png"
+        },
+        {
+          "uri": "https://example.com/animations/bark-001.mp4",
+          "type": "video/mp4"
+        }
+      ],
+      "category": "image",
+      "creators": [
+        {
+          "address": "Er8eAGu5j9fV5dUgRJnAzwKtAWvmovjNuyEvdUJrvXet",
+          "share": 100
+        }
+      ]
+    }
+  }
+  
+  

@@ -1,7 +1,6 @@
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useEffect, useState, useCallback } from 'react'
 import { toast } from "@/hooks/use-toast"
-import { PublicKey } from '@solana/web3.js'
 import { WalletName } from '@solana/wallet-adapter-base'
 
 interface User {
@@ -24,6 +23,15 @@ export function useWalletConnection() {
           },
           body: JSON.stringify({ publicKey: wallet.publicKey.toBase58() }),
         })
+
+        if (!response.ok) {
+          if (response.status === 502) {
+            throw new Error('Server is temporarily unavailable. Please try again later.')
+          }
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+        }
+
         const data = await response.json()
         if (!data.success) {
           throw new Error(data.error || 'Failed to fetch user data')
@@ -33,7 +41,7 @@ export function useWalletConnection() {
         console.error('Error connecting wallet:', error)
         toast({
           title: "Error",
-          description: "Failed to connect wallet. Please try again.",
+          description: error instanceof Error ? error.message : "Failed to connect wallet. Please try again.",
           variant: "destructive",
         })
         setUser(null)
@@ -41,7 +49,7 @@ export function useWalletConnection() {
     } else {
       setUser(null)
     }
-  }, [wallet])
+  }, [wallet, toast])
 
   const connectWallet = useCallback((walletName?: WalletName) => {
     if (wallet?.select && walletName) {

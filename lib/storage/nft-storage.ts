@@ -1,7 +1,6 @@
-import { NFTStorage, File } from 'nft.storage'
+import { NFTStorage, File, Blob } from 'nft.storage'
 import { Metadata, StorageStats, StorageStatus } from '@/types/nft'
 import { toast } from '@/hooks/use-toast'
-import { logger } from '@/lib/logger'
 
 if (!process.env.NFT_STORAGE_API_KEY) {
   throw new Error('NFT_STORAGE_API_KEY is not defined in the environment variables')
@@ -9,6 +8,9 @@ if (!process.env.NFT_STORAGE_API_KEY) {
 
 const client = new NFTStorage({ token: process.env.NFT_STORAGE_API_KEY })
 
+/**
+ * Stores an NFT's metadata and assets on IPFS
+ */
 export async function storeNFT(
   image: File,
   name: string,
@@ -22,7 +24,8 @@ export async function storeNFT(
   }
 ): Promise<string> {
   try {
-    if (image.size > 100 * 1024 * 1024) {
+    // Validate image size and type
+    if (image.size > 100 * 1024 * 1024) { // 100MB limit
       throw new Error('Image file is too large. Maximum size is 100MB.')
     }
 
@@ -40,9 +43,11 @@ export async function storeNFT(
       properties
     }
 
+    // Store metadata and get IPFS URI
     const metadataURI = await client.store(metadata)
-    logger.info('NFT data stored successfully. IPFS URL:', metadataURI.url)
+    console.log('NFT data stored successfully. IPFS URL:', metadataURI.url)
     
+    // Verify the upload
     const status = await checkStatus(metadataURI.url.split('ipfs://')[1])
     if (status.pin.status === 'failed') {
       throw new Error('Failed to pin content to IPFS')
@@ -55,7 +60,7 @@ export async function storeNFT(
 
     return metadataURI.url
   } catch (error) {
-    logger.error('Error storing NFT data:', error)
+    console.error('Error storing NFT data:', error)
     toast({
       title: "Storage Error",
       description: error instanceof Error ? error.message : "Failed to store NFT data",
@@ -65,21 +70,25 @@ export async function storeNFT(
   }
 }
 
+/**
+ * Retrieves NFT metadata from IPFS
+ */
 export async function retrieveNFT(cid: string): Promise<Metadata> {
   try {
-    const metadata = await client.check(cid)
+    const metadata = await client.get(cid)
     if (!metadata) {
       throw new Error('Metadata not found')
     }
 
+    // Verify the content is still pinned
     const status = await checkStatus(cid)
     if (status.pin.status === 'failed') {
       throw new Error('Content is not properly pinned')
     }
 
-    return metadata as unknown as Metadata
+    return metadata.data as Metadata
   } catch (error) {
-    logger.error('Error retrieving NFT data:', error)
+    console.error('Error retrieving NFT data:', error)
     toast({
       title: "Retrieval Error",
       description: "Failed to retrieve NFT data from IPFS",
@@ -89,15 +98,22 @@ export async function retrieveNFT(cid: string): Promise<Metadata> {
   }
 }
 
+/**
+ * Stores a single image file on IPFS
+ */
 export async function storeImage(
   image: File,
   options?: { verify?: boolean }
 ): Promise<string> {
   try {
+    // Create a blob with the file data
     const blob = new Blob([image], { type: image.type })
+    
+    // Store the blob
     const cid = await client.storeBlob(blob)
     const ipfsUrl = `https://ipfs.io/ipfs/${cid}`
 
+    // Verify the upload if requested
     if (options?.verify) {
       const status = await checkStatus(cid)
       if (status.pin.status === 'failed') {
@@ -107,7 +123,7 @@ export async function storeImage(
 
     return ipfsUrl
   } catch (error) {
-    logger.error('Error storing image:', error)
+    console.error('Error storing image:', error)
     toast({
       title: "Image Storage Error",
       description: "Failed to store image on IPFS",
@@ -117,6 +133,9 @@ export async function storeImage(
   }
 }
 
+/**
+ * Stores multiple files on IPFS
+ */
 export async function storeDirectory(
   files: File[],
   options?: { verify?: boolean }
@@ -134,7 +153,7 @@ export async function storeDirectory(
 
     return ipfsUrl
   } catch (error) {
-    logger.error('Error storing directory:', error)
+    console.error('Error storing directory:', error)
     toast({
       title: "Directory Storage Error",
       description: "Failed to store directory on IPFS",
@@ -144,6 +163,9 @@ export async function storeDirectory(
   }
 }
 
+/**
+ * Checks the status of stored content
+ */
 export async function checkStatus(cid: string): Promise<StorageStatus> {
   try {
     const status = await client.status(cid)
@@ -157,25 +179,31 @@ export async function checkStatus(cid: string): Promise<StorageStatus> {
       }
     }
   } catch (error) {
-    logger.error('Error checking status:', error)
+    console.error('Error checking status:', error)
     throw error
   }
 }
 
+/**
+ * Gets storage statistics
+ */
 export async function getStorageStats(): Promise<StorageStats> {
   try {
-    const stats = await client.status()
+    const stats = await client.stats()
     return {
       totalSize: stats.totalSize,
       totalFiles: stats.totalFiles,
       lastUpdate: new Date(stats.lastUpdate)
     }
   } catch (error) {
-    logger.error('Error getting storage stats:', error)
+    console.error('Error getting storage stats:', error)
     throw error
   }
 }
 
+/**
+ * Deletes stored content (if possible)
+ */
 export async function deleteNFT(cid: string): Promise<void> {
   try {
     await client.delete(cid)
@@ -184,7 +212,7 @@ export async function deleteNFT(cid: string): Promise<void> {
       description: "Content has been successfully deleted",
     })
   } catch (error) {
-    logger.error('Error deleting content:', error)
+    console.error('Error deleting content:', error)
     toast({
       title: "Deletion Error",
       description: "Failed to delete content",
@@ -194,6 +222,9 @@ export async function deleteNFT(cid: string): Promise<void> {
   }
 }
 
+/**
+ * Checks if content exists and is properly stored
+ */
 export async function checkNFTExists(cid: string): Promise<boolean> {
   try {
     const status = await checkStatus(cid)

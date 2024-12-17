@@ -39,4 +39,3 @@ model Transaction {
   price     Float
   timestamp DateTime @default(now())
 }
-

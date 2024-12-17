@@ -7,13 +7,13 @@ class CustomLogger {
     
     if (isServer) {
       // Server-side logging
-      console[level as 'log' | 'info' | 'warn' | 'error'](formattedMessage, ...(meta || []))
+      console[level as 'log' | 'info' | 'warn' | 'error'](formattedMessage, ...(meta.filter(item => item != null)))
     } else {
       // Client-side logging
       if (level === 'error') {
-        console.error(formattedMessage, ...(meta || []))
+        console.error(formattedMessage, ...(meta.filter(item => item != null)))
       } else {
-        console.log(formattedMessage, ...(meta || []))
+        console.log(formattedMessage, ...(meta.filter(item => item != null)))
       }
     }
   }
@@ -38,4 +38,3 @@ class CustomLogger {
 }
 
 export const logger = new CustomLogger()
-
