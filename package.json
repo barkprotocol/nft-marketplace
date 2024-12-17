@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "generate": "npx prisma generate",
-    "database": "npx prisma db push",
+    "migrate": "npx prisma migrate dev --nft-marketplace init",
+    "update:database": "npx prisma db push",
     "lint": "next lint"
   },
   "dependencies": {
