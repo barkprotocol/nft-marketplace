@@ -35,3 +35,4 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children
 }
 
 export default WalletContextProvider
+

@@ -10,15 +10,16 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
+import { WalletName } from '@solana/wallet-adapter-base'
 
 const walletOptions = [
-  { name: 'Phantom', icon: '👻' },
-  { name: 'Solflare', icon: '🔆' },
-  { name: 'Backpack', icon: '🎒' },
+  { name: 'Phantom' as WalletName, icon: '👻' },
+  { name: 'Solflare' as WalletName, icon: '🔆' },
+  { name: 'Backpack' as WalletName, icon: '🎒' },
 ]
 
 export function WalletButton() {
-  const { wallet } = useWalletConnection()
+  const { wallet, connectWallet, disconnectWallet } = useWalletConnection()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -26,18 +27,19 @@ export function WalletButton() {
   }, [])
 
   if (!mounted) {
-    return <Button variant="outline">Loading...</Button>
+    return <Button variant="outline" size="default">Loading...</Button>
   }
 
   if (wallet.connected && wallet.publicKey) {
     return (
       <Button
         variant="outline"
+        size="default"
         className="flex items-center space-x-2 bg-primary text-primary-foreground hover:bg-primary/90"
-        onClick={wallet.disconnect}
+        onClick={disconnectWallet}
       >
-        <span className="hidden sm:inline">{wallet.publicKey.toBase58().slice(0, 4)}...{wallet.publicKey.toBase58().slice(-4)}</span>
-        <LogOut className="h-4 w-4" />
+        <span className="hidden sm:inline text-sm">{wallet.publicKey.toBase58().slice(0, 4)}...{wallet.publicKey.toBase58().slice(-4)}</span>
+        <LogOut className="h-5 w-5" />
       </Button>
     )
   }
@@ -47,25 +49,20 @@ export function WalletButton() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
+          size="default"
           className="flex items-center space-x-2 bg-primary text-primary-foreground hover:bg-primary/90"
         >
-          <Wallet className="h-4 w-4" />
-          <span className="hidden sm:inline">Connect Wallet</span>
-          <ChevronDown className="h-4 w-4" />
+          <Wallet className="h-5 w-5" />
+          <span className="hidden sm:inline text-sm">Connect</span>
+          <ChevronDown className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-48">
         {walletOptions.map((option) => (
           <DropdownMenuItem
             key={option.name}
-            onClick={() => {
-              if (wallet.select) {
-                wallet.select(option.name)
-              } else if (wallet.connect) {
-                wallet.connect()
-              }
-            }}
-            className="flex items-center space-x-2 cursor-pointer"
+            onClick={() => connectWallet(option.name)}
+            className="flex items-center space-x-2 cursor-pointer text-sm"
           >
             <span>{option.icon}</span>
             <span>{option.name}</span>

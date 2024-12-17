@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 export async function GET() {
   try {
@@ -8,9 +9,12 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json(nfts)
+    return NextResponse.json({ success: true, data: nfts })
   } catch (error) {
-    console.error('Request error', error)
-    return NextResponse.error()
+    logger.error('Error fetching NFTs:', error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch NFTs' },
+      { status: 500 }
+    )
   }
 }

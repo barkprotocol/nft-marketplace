@@ -1,81 +1,47 @@
-import { PublicKey } from '@solana/web3.js';
+import { File } from 'nft.storage'
 
 export interface NFTAttribute {
   trait_type: string;
   value: string | number;
 }
 
-export interface NFTFile {
-  uri: string;
-  type: string;
-}
-
-export interface NFTCreator {
-  address: string;
-  share: number;
-}
-
 export interface NFTProperties {
-  files: NFTFile[];
-  category: string;
-  creators: NFTCreator[];
+  files?: Array<{
+    uri: string;
+    type: string;
+    cdn?: boolean;
+  }>;
+  category?: string;
+  creators?: Array<{
+    address: string;
+    share: number;
+  }>;
 }
 
-export interface NFTMetadata {
+export interface Metadata {
   name: string;
-  symbol: string;
   description: string;
-  seller_fee_basis_points: number;
-  image: string;
-  animation_url?: string;
+  image: File;
+  attributes: NFTAttribute[];
+  properties?: NFTProperties;
   external_url?: string;
-  attributes: NFTAttribute[];
-  properties: NFTProperties;
+  animation_url?: string;
+  background_color?: string;
 }
 
-export interface NFT {
-  id: string;
-  mintAddress: string;
-  name: string;
-  description?: string;
-  image: string;
-  attributes: NFTAttribute[];
-  price?: number;
-  owner: PublicKey;
-  isListed: boolean;
-  isStaked: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+export interface StorageStatus {
+  cid: string;
+  size: number;
+  created: Date;
+  pin: {
+    status: 'queued' | 'pinning' | 'pinned' | 'failed';
+    created: Date;
+  };
 }
 
-export interface StakedNFT extends NFT {
-  stakedAt: Date;
-  rewards: number;
-}
-
-export interface NFTListing {
-  id: string;
-  nftId: string;
-  price: number;
-  seller: PublicKey;
-  createdAt: Date;
-}
-
-export interface NFTTransaction {
-  id: string;
-  nftId: string;
-  fromAddress: string;
-  toAddress: string;
-  price: number;
-  transactionSignature: string;
-  createdAt: Date;
-}
-
-export interface NFTCollection {
-  id: string;
-  name: string;
-  description?: string;
-  image: string;
-  nfts: NFT[];
+export interface StorageStats {
+  totalSize: number;
+  totalFiles: number;
+  lastUpdate: Date;
 }
 

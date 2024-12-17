@@ -1,5 +1,5 @@
 import { NFTStorage, File } from 'nft.storage'
-import { Metadata, StorageStats, StorageStatus } from '@/app/types/nft'
+import { Metadata, StorageStats, StorageStatus } from '@/types/nft'
 import { toast } from '@/hooks/use-toast'
 import { logger } from '@/lib/logger'
 
@@ -67,7 +67,7 @@ export async function storeNFT(
 
 export async function retrieveNFT(cid: string): Promise<Metadata> {
   try {
-    const metadata = await client.get(cid)
+    const metadata = await client.check(cid)
     if (!metadata) {
       throw new Error('Metadata not found')
     }
@@ -77,7 +77,7 @@ export async function retrieveNFT(cid: string): Promise<Metadata> {
       throw new Error('Content is not properly pinned')
     }
 
-    return metadata.data as Metadata
+    return metadata as unknown as Metadata
   } catch (error) {
     logger.error('Error retrieving NFT data:', error)
     toast({
@@ -164,7 +164,7 @@ export async function checkStatus(cid: string): Promise<StorageStatus> {
 
 export async function getStorageStats(): Promise<StorageStats> {
   try {
-    const stats = await client.stats()
+    const stats = await client.status()
     return {
       totalSize: stats.totalSize,
       totalFiles: stats.totalFiles,

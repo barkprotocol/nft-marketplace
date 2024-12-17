@@ -20,25 +20,21 @@ export default function FeaturedCollection() {
 
   useEffect(() => {
     fetch('/api/featured-nfts')
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => {
-        if (!Array.isArray(data)) {
-          throw new Error('Invalid data format');
+        if (data.success) {
+          setFeaturedNFTs(data.data)
+        } else {
+          throw new Error(data.error || 'Failed to fetch featured NFTs')
         }
-        setFeaturedNFTs(data);
-        setIsLoading(false);
+        setIsLoading(false)
       })
       .catch(error => {
-        console.error('Error fetching featured NFTs:', error);
-        setError(error.message);
-        setIsLoading(false);
-      });
-  }, []);
+        console.error('Error fetching featured NFTs:', error)
+        setError(error.message)
+        setIsLoading(false)
+      })
+  }, [])
 
   if (isLoading) {
     return <div className="text-center">Loading featured collection...</div>
@@ -59,7 +55,7 @@ export default function FeaturedCollection() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4" style={{ color: '#D0C8B9' }}>Featured Collection</h2>
+      <h2 className="text-2xl font-bold mb-4 text-primary">Featured Collection</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {featuredNFTs.map((nft) => (
           <Card key={nft.id}>

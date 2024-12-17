@@ -2,7 +2,7 @@ import { Inter } from 'next/font/google'
 import './styles/globals.css'
 import Header from '@/components/ui/layout/header'
 import Footer from '@/components/ui/layout/footer'
-import WalletContextProvider from '@/components/providers/wallet-provider'
+import { WalletContextProvider } from '@/components/providers/wallet-provider'
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import ErrorBoundary from '@/components/error-boundary'
 import { Metadata } from 'next'
