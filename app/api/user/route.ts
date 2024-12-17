@@ -27,15 +27,9 @@ export async function POST(request: Request) {
       })
     } catch (dbError) {
       logger.error('Database error:', { error: dbError instanceof Error ? dbError.message : 'Unknown database error' })
-      if (dbError instanceof Error && dbError.message.includes('Invalid `prisma.')) {
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Database configuration error. Please contact support.'
-        }, { status: 503 })
-      }
       return NextResponse.json({ 
         success: false, 
-        error: 'Database connection error. Please try again later.'
+        error: 'Database error. Please try again later.'
       }, { status: 503 })
     }
 
@@ -67,4 +61,3 @@ export async function POST(request: Request) {
     }, { status: 500 })
   }
 }
-

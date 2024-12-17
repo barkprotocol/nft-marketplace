@@ -6,7 +6,7 @@ import { z } from 'zod'
 const userIdSchema = z.string().uuid()
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { userId: string } }
 ) {
   try {

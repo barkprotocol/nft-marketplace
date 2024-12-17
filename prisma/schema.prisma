@@ -12,6 +12,7 @@ model User {
   publicKey String   @unique
   username  String?
   nfts      NFT[]
+  balance   Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -22,11 +23,14 @@ model NFT {
   name        String
   description String?
   image       String
+  metadataUri String
   owner       User     @relation(fields: [ownerId], references: [id])
   ownerId     String
   price       Float?
   isListed    Boolean  @default(false)
   isStaked    Boolean  @default(false)
+  stakedAt    DateTime?
+  rewards     Float    @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -37,5 +41,14 @@ model Transaction {
   sellerId  String
   buyerId   String
   price     Float
+  timestamp DateTime @default(now())
+  transactionSignature String
+}
+
+model RewardsClaim {
+  id        String   @id @default(cuid())
+  userId    String
+  nftId     String
+  amount    Float
   timestamp DateTime @default(now())
 }

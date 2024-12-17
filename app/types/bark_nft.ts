@@ -1,9 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 
-export interface BarkNftProgram extends Program<BarkNft> {
-  version: string;
-}
+export interface BarkNftProgram extends Program<BarkNft> {}
 
 export interface BarkNft {
   version: "0.1.0";

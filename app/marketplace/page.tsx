@@ -3,13 +3,17 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletConnection } from '@/hooks/use-wallet-connection'
-import { getProgram, mintNFT } from '@/app/utils/anchor'
+import { getProgram, createMintNFTTransaction, sendAndConfirmTransaction } from '@/app/utils/anchor'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Plus, Loader2 } from 'lucide-react'
 import { NFTCard } from '@/components/ui/layout/nft-card'
 import { logger } from '@/lib/logger'
+import { Connection, Keypair } from '@solana/web3.js'
+import { NFTMintForm } from '@/components/mint/mint-nft-form'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { storeNFT } from '@/lib/storage/nft-storage'
 
 interface NFT {
   id: string;
@@ -22,7 +26,8 @@ export default function Marketplace() {
   const [nfts, setNfts] = useState<NFT[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isMinting, setIsMinting] = useState(false)
-  const { connected, publicKey } = useWallet()
+  const [mintDialogOpen, setMintDialogOpen] = useState(false)
+  const { connected, publicKey, signTransaction } = useWallet()
   const { user } = useWalletConnection()
   const anchorWallet = useAnchorWallet()
   const { toast } = useToast()
@@ -35,7 +40,7 @@ export default function Marketplace() {
         throw new Error('Failed to fetch NFTs')
       }
       const data = await response.json()
-      setNfts(data)
+      setNfts(data.data)
     } catch (error) {
       logger.error('Error fetching NFTs:', error)
       toast({
@@ -97,8 +102,8 @@ export default function Marketplace() {
     }
   }
 
-  const handleMint = async () => {
-    if (!connected || !anchorWallet) {
+  const handleMint = async (formData: FormData) => {
+    if (!connected || !anchorWallet || !signTransaction) {
       toast({
         title: "Wallet not connected",
         description: "Please connect your wallet to mint NFTs.",
@@ -109,21 +114,36 @@ export default function Marketplace() {
 
     setIsMinting(true)
     try {
-      const program = getProgram(anchorWallet)
-      const mintAddress = await mintNFT(
-        program,
-        anchorWallet,
-        'https://marketplace.barkprotocol.net/nft.json',
-        'BARK NFT'
+      const name = formData.get('name') as string
+      const description = formData.get('description') as string
+      const image = formData.get('image') as File
+
+      // Store NFT metadata on IPFS
+      const metadataUri = await storeNFT(image, name, description, [])
+
+      const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_HOST!, 'confirmed')
+      const { transaction, mint } = await createMintNFTTransaction(
+        connection,
+        anchorWallet.publicKey,
+        metadataUri,
+        name
       )
 
-      logger.info(`NFT minted successfully. Mint address: ${mintAddress.toString()}`)
+      const signedTransaction = await signTransaction(transaction)
+      const txSignature = await sendAndConfirmTransaction(
+        connection,
+        signedTransaction,
+        [mint]
+      )
+
+      logger.info(`NFT minted successfully. Mint address: ${mint.publicKey.toString()}`)
       toast({
         title: "NFT Minted",
-        description: `Successfully minted NFT with address: ${mintAddress.toString()}`,
+        description: `Successfully minted NFT with address: ${mint.publicKey.toString()}`,
       })
       
       await fetchNFTs()
+      setMintDialogOpen(false)
     } catch (error) {
       logger.error('Error minting NFT:', error)
       toast({
@@ -155,19 +175,20 @@ export default function Marketplace() {
       </div>
       
       <div className="flex justify-center mb-8">
-        <Button onClick={handleMint} className="bg-primary text-primary-foreground" disabled={isMinting || !connected}>
-          {isMinting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Minting...
-            </>
-          ) : (
-            <>
+        <Dialog open={mintDialogOpen} onOpenChange={setMintDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary text-primary-foreground" disabled={!connected}>
               <Plus className="mr-2" size={18} />
               Mint New NFT
-            </>
-          )}
-        </Button>
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Mint a New NFT</DialogTitle>
+            </DialogHeader>
+            <NFTMintForm onSubmit={handleMint} isLoading={isMinting} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -185,4 +206,3 @@ export default function Marketplace() {
     </div>
   )
 }
-

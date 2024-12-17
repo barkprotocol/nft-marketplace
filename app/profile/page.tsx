@@ -73,7 +73,7 @@ export default function Profile() {
     fetchUserData()
   }, [user, toast])
 
-  const handleListNFT = async (_nftId: string) => {
+  const handleListNFT = async (nftId: string) => {
     // Implement NFT listing logic here
     toast({
       title: "NFT Listing",
@@ -81,7 +81,7 @@ export default function Profile() {
     })
   }
 
-  const handleUnlistNFT = async (_nftId: string) => {
+  const handleUnlistNFT = async (nftId: string) => {
     // Implement NFT unlisting logic here
     toast({
       title: "NFT Unlisting",
