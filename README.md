@@ -88,6 +88,34 @@ BARK is a decentralized NFT marketplace and staking platform built on the Solana
 
 4. Explore the marketplace, mint new NFTs, or stake your existing NFTs.
 
+## Prisma Config
+
+##### Install Prisma and Prisma Client
+```
+pnpm install prisma --save-dev
+pnpm install @prisma/client
+```
+##### Initialize Prisma
+```
+npx prisma init
+```
+##### Generate Prisma Client
+```
+npx prisma generate
+```
+#### Apply database migrations
+```
+npx prisma migrate dev --name init
+```
+#### Test Prisma Client (optional)
+```
+npx ts-node scripts/test-prisma.ts
+```
+### Notes! 
+ - Supabase Console: Use Supabase's dashboard to monitor tables and data.
+ - Migrations: Always run npx prisma migrate dev when modifying the schema.
+ - Production: For production databases, use npx prisma migrate deploy.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
