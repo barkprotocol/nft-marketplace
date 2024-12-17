@@ -52,3 +52,4 @@ model RewardsClaim {
   amount    Float
   timestamp DateTime @default(now())
 }
+

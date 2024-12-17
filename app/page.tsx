@@ -1,8 +1,22 @@
+import { createServerSupabaseClient } from '@/app/utils/supabase/server'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
 import FeaturedCollection from '@/components/ui/layout/featured-collection'
 
-export default function Home() {
+export default async function Home() {
+  const supabase = createServerSupabaseClient()
+  
+  // Fetch featured NFTs from Supabase
+  const { data: featuredNFTs, error } = await supabase
+    .from('nfts')
+    .select('id, name, image, price')
+    .eq('is_featured', true)
+    .limit(4)
+
+  if (error) {
+    console.error('Error fetching featured NFTs:', error)
+  }
+
   return (
     <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="text-center mb-12 md:mb-20">
@@ -22,7 +36,7 @@ export default function Home() {
           </Button>
         </div>
       </div>
-      <FeaturedCollection />
+      <FeaturedCollection initialNFTs={featuredNFTs || []} />
     </div>
   )
 }
