@@ -83,13 +83,22 @@ export const sendAndConfirmTransaction = async (
 
 export const mintNFT = async (
   connection: web3.Connection,
-  payer: web3.Keypair,
+  program: Program<BarkNft>,
+  payer: web3.Keypair | AnchorWallet,
   uri: string,
   name: string
 ): Promise<web3.PublicKey> => {
-  const { transaction, mint } = await createMintNFTTransaction(connection, payer.publicKey, uri, name)
-  await sendAndConfirmTransaction(connection, transaction, [payer, mint])
-  return mint.publicKey
+  const mint = web3.Keypair.generate();
+  const { transaction } = await createMintNFTTransaction(connection, payer.publicKey, uri, name);
+
+  if (payer instanceof web3.Keypair) {
+    await sendAndConfirmTransaction(connection, transaction, [payer, mint]);
+  } else {
+    const signedTx = await payer.signTransaction(transaction);
+    await connection.sendRawTransaction(signedTx.serialize());
+  }
+
+  return mint.publicKey;
 }
 
 export interface BarkNft {

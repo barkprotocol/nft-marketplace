@@ -19,32 +19,35 @@ export default function FeaturedCollection() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchFeaturedNFTs = async () => {
-      try {
-        const response = await fetch('/api/featured-nfts')
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-        const data = await response.json()
-        if (data.success) {
-          setFeaturedNFTs(data.data)
-        } else {
-          throw new Error(data.error || 'Failed to fetch featured NFTs')
-        }
-      } catch (error) {
-        console.error('Error fetching featured NFTs:', error)
-        setError('Failed to load featured NFTs. Please try again later.')
-        toast({
-          title: "Error",
-          description: "Failed to load featured NFTs. Please try again later.",
-          variant: "destructive",
-        })
-      } finally {
-        setIsLoading(false)
+  const fetchFeaturedNFTs = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const response = await fetch('/api/featured-nfts')
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
       }
+      const data = await response.json()
+      if (data.success && Array.isArray(data.data)) {
+        setFeaturedNFTs(data.data)
+      } else {
+        throw new Error('Invalid response format')
+      }
+    } catch (error) {
+      console.error('Error fetching featured NFTs:', error)
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred')
+      toast({
+        title: "Error",
+        description: "Failed to load featured NFTs. Please try again later.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchFeaturedNFTs()
   }, [])
 
@@ -62,6 +65,9 @@ export default function FeaturedCollection() {
       <div className="text-center p-4 bg-destructive/10 rounded-lg">
         <AlertCircle className="inline-block mr-2 h-6 w-6 text-destructive" />
         <span className="text-lg text-destructive">{error}</span>
+        <Button onClick={fetchFeaturedNFTs} className="mt-4">
+          Retry
+        </Button>
       </div>
     )
   }
@@ -98,3 +104,4 @@ export default function FeaturedCollection() {
     </div>
   )
 }
+

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import prisma from '@/lib/prisma';
 import { getProgram, mintNFT } from '@/app/utils/anchor';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, Connection, Keypair } from '@solana/web3.js';
+import { AnchorProvider } from '@coral-xyz/anchor';
 import { BN } from '@coral-xyz/anchor';
 
 export async function POST(request: NextRequest) {
@@ -56,15 +57,21 @@ async function handleNFTMinted(data: {
       throw new Error(`User not found for public key: ${data.userPublicKey}`);
     }
 
-    const anchorWallet = {
-      publicKey: new PublicKey(data.userPublicKey),
-      signTransaction: async () => { throw new Error('Not implemented') },
-      signAllTransactions: async () => { throw new Error('Not implemented') },
-    };
+    const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_HOST!, 'confirmed');
+    const anchorWallet = new AnchorProvider(
+      connection,
+      {
+        publicKey: new PublicKey(data.userPublicKey),
+        signTransaction: async () => { throw new Error('Not implemented') },
+        signAllTransactions: async () => { throw new Error('Not implemented') },
+      },
+      { commitment: 'confirmed' }
+    );
 
-    const program = getProgram(anchorWallet);
+    const program = getProgram(connection, anchorWallet);
 
     const mintAddress = await mintNFT(
+      connection,
       program,
       anchorWallet,
       data.nftUri,
@@ -135,4 +142,3 @@ async function handleRewardsClaimed(data: {
     throw error;
   }
 }
-

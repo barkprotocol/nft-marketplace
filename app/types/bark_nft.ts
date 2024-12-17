@@ -1,9 +1,9 @@
 import { PublicKey } from '@solana/web3.js';
-import { Program, AnchorProvider } from '@coral-xyz/anchor';
+import { Program, AnchorProvider, Idl } from '@coral-xyz/anchor';
 
 export interface BarkNftProgram extends Program<BarkNft> {}
 
-export interface BarkNft {
+export interface BarkNft extends Idl {
   version: "0.1.0";
   name: "bark_nft";
   instructions: [
@@ -104,6 +104,10 @@ export interface BarkNft {
       ];
     }
   ];
+  address: string;
+  metadata: {
+    address: string;
+  };
 }
 
 export interface MintNftAccounts {
