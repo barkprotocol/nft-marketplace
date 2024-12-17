@@ -6,10 +6,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "generate": "npx prisma generate",
     "migrate": "npx prisma migrate dev --nft-marketplace init",
+    "migrate:dev": "npx prisma migrate dev",
     "update:database": "npx prisma db push",
     "lint": "next lint"
   },
