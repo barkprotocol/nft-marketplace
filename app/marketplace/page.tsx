@@ -8,7 +8,7 @@ import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Plus, Loader2 } from 'lucide-react'
-import { NFTCard } from '@/components/ui/layout/nft-card'
+import { NFTCard } from '@/components/ui/nft-card'
 import { logger } from '@/lib/logger'
 import { Connection, Keypair } from '@solana/web3.js'
 import { NFTMintForm } from '@/components/mint/mint-nft-form'

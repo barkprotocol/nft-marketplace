@@ -13,112 +13,121 @@ BARK is a decentralized NFT marketplace and staking platform built on the Solana
 
 ## Technologies Used
 
-- Next.js 15.1.0 with App Router
-- React 19
-- TypeScript
-- Solana Web3.js
-- Anchor Framework
-- Prisma ORM
-- Supabase (PostgreSQL database)
-- Tailwind CSS
-- shadcn/ui components
-- Lucide icons
+- **Next.js** 15.1.0 with App Router
+- **React** 19
+- **TypeScript**
+- **Solana Web3.js**
+- **Anchor Framework**
+- **Prisma ORM**
+- **Supabase** (PostgreSQL database)
+- **Tailwind CSS**
+- **Shadcn/ui components**
+- **Lucide icons**
 
 ## Prerequisites
 
 - Node.js (v16 or later)
-- npm or yarn
+- npm, pnpm, or yarn
 - Solana CLI tools
-- A Solana wallet (Solflare, Metamask, Phantom, or Backpack)
-
-## Prerequisites
-
-- Node.js (v14 or later)
-- npm or yarn
-- Solana CLI tools
-- A Solana wallet (Solflare, Metamask, Phantom, Torus or Backpack)
+- A Solana wallet (e.g., Solflare, Metamask, Phantom, Backpack)
 
 ## Installation
 
-1. Clone the repository:
-   ```
+1. **Clone the repository:**
+   ```bash
    git clone https://github.com/bark-protocol/nft-marketplace.git
    cd nft-marketplace
    ```
 
-2. Install dependencies:
-   ```
+2. **Install dependencies:**
+   ```bash
    pnpm install
    # or
    yarn install
    ```
 
-3. Set up environment variables:
-   Create a `.env.local` file in the root directory and add the following variables:
-   ```
+3. **Set up environment variables:**
+
+   Create a `.env.local` file in the root directory and add the following:
+   ```env
    DATABASE_URL=your_supabase_postgres_url
    NEXT_PUBLIC_SOLANA_RPC_HOST=your_solana_rpc_url
    ```
 
-4. Run database migrations:
-   ```
+4. **Run database migrations:**
+   ```bash
    npx prisma migrate dev
    ```
 
-5. Build the Anchor program:
-   ```
+5. **Build the Anchor program:**
+   ```bash
    cd lib/programs/bark-nft
    anchor build
    ```
 
-6. Deploy the Anchor program to your Solana network of choice (localnet, devnet, or mainnet-beta).
+6. **Deploy the Anchor program:**
+   Deploy it to the desired Solana network (localnet, devnet, or mainnet-beta):
+   ```bash
+   anchor deploy
+   ```
 
 ## Usage
 
-1. Start the development server:
-   ```
+1. **Start the development server:**
+   ```bash
    pnpm run dev
    # or
    yarn dev
    ```
 
-2. Open your browser and navigate to `http://localhost:3000`
+2. **Access the application:**
+   Open your browser and navigate to `http://localhost:3000`.
 
-3. Connect your Solana wallet using the "Connect Wallet" button in the header.
+3. **Connect your wallet:**
+   Use the "Connect Wallet" button in the header to link your Solana wallet.
 
-4. Explore the marketplace, mint new NFTs, or stake your existing NFTs.
+4. **Explore the marketplace:**
+   - Mint new NFTs
+   - Buy or sell listed NFTs
+   - Stake NFTs to earn rewards
 
-## Prisma Config
+## Prisma Configuration
 
-##### Install Prisma and Prisma Client
-```
-pnpm install prisma --save-dev
-pnpm install @prisma/client
-```
-##### Initialize Prisma
-```
-npx prisma init
-```
-##### Generate Prisma Client
-```
-npx prisma generate
-```
-#### Apply database migrations
-```
-npx prisma migrate dev --name init
-```
-#### Test Prisma Client (optional)
-```
-npx ts-node scripts/test-prisma.ts
-```
-### Notes! 
- - Supabase Console: Use Supabase's dashboard to monitor tables and data.
- - Migrations: Always run npx prisma migrate dev when modifying the schema.
- - Production: For production databases, use npx prisma migrate deploy.
+1. **Install Prisma and Prisma Client:**
+   ```bash
+   pnpm install prisma --save-dev
+   pnpm install @prisma/client
+   ```
+
+2. **Initialize Prisma:**
+   ```bash
+   npx prisma init
+   ```
+
+3. **Generate the Prisma Client:**
+   ```bash
+   npx prisma generate
+   ```
+
+4. **Apply database migrations:**
+   ```bash
+   npx prisma migrate dev --name init
+   ```
+
+5. **Test Prisma Client (optional):**
+   Create a script (`scripts/test-prisma.ts`) and run:
+   ```bash
+   npx ts-node scripts/test-prisma.ts
+   ```
+
+### Notes
+- **Supabase Console:** Use the Supabase dashboard to monitor and manage tables and data.
+- **Migrations:** Always run `npx prisma migrate dev` after schema changes.
+- **Production Databases:** Use `npx prisma migrate deploy` for production.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Feel free to fork the repository and submit a pull request.
 
 ## License
 

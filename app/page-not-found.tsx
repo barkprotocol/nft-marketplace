@@ -1,18 +1,28 @@
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import { FileQuestion } from 'lucide-react'
 
-export default function PageNotFound() {
+export default function NotFound() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground">
-      <FileQuestion className="w-24 h-24 text-primary mb-6" />
-      <h1 className="text-4xl font-bold mb-2">404 - Page Not Found</h1>
-      <p className="text-xl mb-6">Oops! The page you're looking for doesn't exist.</p>
-      <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-        <Link href="/">
-          Return to Home
-        </Link>
-      </Button>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-950">
+      <div className="text-center px-4">
+        <h1 className="text-6xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
+        <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Page Not Found</h2>
+        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+          Oops! The page you're looking for doesn't exist or has been moved.
+        </p>
+        <div className="space-y-4 sm:space-y-0 sm:space-x-4">
+          <Button asChild size="lg" className="bg-[#d0c8b9] hover:bg-[#c5bdae] text-gray-900">
+            <Link href="/">
+              Return Home
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="lg" className="bg-white dark:bg-gray-800 bg-opacity-20 hover:bg-opacity-30">
+            <Link href="/marketplace">
+              Explore Marketplace
+            </Link>
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

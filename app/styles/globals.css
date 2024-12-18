@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -42,6 +38,7 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -84,6 +81,7 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
@@ -126,14 +124,59 @@ html {
 
 @media (min-width: 640px) {
   html {
-    font-size: 18px;
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 17px;
   }
 }
 
 @media (min-width: 1024px) {
   html {
-    font-size: 20px;
+    font-size: 18px;
   }
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: 19px;
+  }
+}
+
+/* Improved typography */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold tracking-tight;
+}
+
+h1 {
+  @apply text-4xl sm:text-5xl md:text-6xl;
+}
+
+h2 {
+  @apply text-3xl sm:text-4xl md:text-5xl;
+}
+
+h3 {
+  @apply text-2xl sm:text-3xl md:text-4xl;
+}
+
+h4 {
+  @apply text-xl sm:text-2xl md:text-3xl;
+}
+
+h5 {
+  @apply text-lg sm:text-xl md:text-2xl;
+}
+
+h6 {
+  @apply text-base sm:text-lg md:text-xl;
+}
+
+p {
+  @apply leading-relaxed;
 }
 
 /* Mobile-friendly adjustments */
@@ -147,11 +190,19 @@ html {
   }
 
   .mobile-stack {
-    flex-direction: column;
+    @apply flex flex-col;
   }
 
   .mobile-center {
-    text-align: center;
+    @apply text-center;
+  }
+
+  .mobile-p-4 {
+    @apply p-4;
+  }
+
+  .mobile-text-sm {
+    @apply text-sm;
   }
 }
 
@@ -166,11 +217,72 @@ html {
 }
 
 .focus-visible:focus-visible {
-  outline: 2px solid var(--ring);
+  outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
 }
 
 /* Dark mode improvements */
 .dark img {
   filter: brightness(.8) contrast(1.2);
+}
+
+/* Improved form elements */
+input, textarea, select {
+  @apply w-full px-3 py-2 text-sm rounded-md border border-input bg-background;
+}
+
+input:focus, textarea:focus, select:focus {
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-accent;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Utility classes */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400;
+}
+
+.bg-gradient {
+  @apply bg-gradient-to-r from-blue-500 to-teal-400;
+}
+
+.hover-lift {
+  @apply transition-transform duration-300 ease-in-out hover:-translate-y-1;
+}
+
+.glass-effect {
+  @apply bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg;
+}
+
+.space-y-responsive {
+  @apply space-y-4 sm:space-y-6 md:space-y-8 lg:space-y-10;
+}
+
+.space-x-responsive {
+  @apply space-x-2 sm:space-x-4 md:space-x-6 lg:space-x-8;
 }

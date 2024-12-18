@@ -1,75 +1,49 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useWalletConnection } from '@/hooks/use-wallet-connection'
-import { Button } from "@/components/ui/button"
-import { Wallet, LogOut, ChevronDown } from 'lucide-react'
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu"
-import { WalletName } from '@solana/wallet-adapter-base'
+import { FC, useState } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { Button } from "@/components/ui/button";
 
-const walletOptions = [
-  { name: 'Phantom' as WalletName, icon: '👻' },
-  { name: 'Solflare' as WalletName, icon: '🔆' },
-  { name: 'Backpack' as WalletName, icon: '🎒' },
-]
+export const WalletButton: FC = () => {
+    const { publicKey, wallet, disconnect } = useWallet();
+    const { setVisible } = useWalletModal();
+    const [copying, setCopying] = useState(false);
 
-export function WalletButton() {
-  const { wallet, connectWallet, disconnectWallet } = useWalletConnection()
-  const [mounted, setMounted] = useState(false)
+    const handleWalletClick = () => {
+        if (!wallet) {
+            setVisible?.(true);
+        } else {
+            disconnect?.();
+        }
+    };
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+    const copyAddress = async () => {
+        if (publicKey) {
+            await navigator.clipboard.writeText(publicKey.toBase58());
+            setCopying(true);
+            setTimeout(() => setCopying(false), 400);
+        }
+    };
 
-  if (!mounted) {
-    return <Button variant="outline" size="default">Loading...</Button>
-  }
-
-  if (wallet.connected && wallet.publicKey) {
     return (
-      <Button
-        variant="outline"
-        size="default"
-        className="flex items-center space-x-2 bg-primary text-primary-foreground hover:bg-primary/90"
-        onClick={disconnectWallet}
-      >
-        <span className="hidden sm:inline text-sm">{wallet.publicKey.toBase58().slice(0, 4)}...{wallet.publicKey.toBase58().slice(-4)}</span>
-        <LogOut className="h-5 w-5" />
-      </Button>
-    )
-  }
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="default"
-          className="flex items-center space-x-2 bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          <Wallet className="h-5 w-5" />
-          <span className="hidden sm:inline text-sm">Connect</span>
-          <ChevronDown className="h-5 w-5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        {walletOptions.map((option) => (
-          <DropdownMenuItem
-            key={option.name}
-            onClick={() => connectWallet(option.name)}
-            className="flex items-center space-x-2 cursor-pointer text-sm"
-          >
-            <span>{option.icon}</span>
-            <span>{option.name}</span>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
+        <div className="flex items-center space-x-2">
+            <Button
+                onClick={handleWalletClick}
+                variant="outline"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+                {publicKey ? 'Disconnect' : 'Connect Wallet'}
+            </Button>
+            {publicKey && (
+                <Button
+                    onClick={copyAddress}
+                    variant="outline"
+                    className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                >
+                    {copying ? 'Copied!' : `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}`}
+                </Button>
+            )}
+        </div>
+    );
+};

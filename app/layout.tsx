@@ -1,42 +1,36 @@
-import { Inter } from 'next/font/google'
-import './styles/globals.css'
-import Header from '@/components/ui/layout/header'
-import Footer from '@/components/ui/layout/footer'
-import { WalletContextProvider } from '@/components/providers/wallet-provider'
-import { ThemeProvider } from "@/components/providers/theme-provider"
-import ErrorBoundary from '@/components/error-boundary'
-import { Metadata } from 'next'
+import { Poppins, Syne } from 'next/font/google';
+import { ThemeProvider } from "next-themes";
+import "./styles/globals.css";
+import Header from '@/components/ui/layout/header';
+import Footer from "@/components/ui/layout/footer";
+import { WalletContextProvider } from '@/components/providers/wallet-provider';
 
-const inter = Inter({ subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: 'BARK | NFT Marketplace and Staking',
-  description: 'Buy, sell, and stake your favorite Solana NFTs on BARK Protocol',
-}
+const syne = Syne({ subsets: ["latin"], variable: '--font-syne' });
+const poppins = Poppins({ weight: ["400", "600"], subsets: ["latin"], variable: '--font-poppins' });
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <html lang="en" className={`${syne.variable} ${poppins.variable}`} suppressHydrationWarning>
+      <body className="bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col min-h-screen">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <WalletContextProvider>
-            <ErrorBoundary>
-              <div className="flex flex-col min-h-screen">
-                <Header />
-                <main className="flex-grow">
-                  {children}
-                </main>
-                <Footer />
-              </div>
-            </ErrorBoundary>
+            <Header />
+            <main className="flex-grow w-full">
+              {children}
+            </main>
+            <Footer />
           </WalletContextProvider>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
-

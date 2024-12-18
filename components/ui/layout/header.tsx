@@ -1,69 +1,42 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { WalletButton } from "@/components/ui/wallet-button"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { ShoppingBag, Coins, User } from 'lucide-react'
+import Link from 'next/link';
+import Image from 'next/image';
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { WalletButton } from "@/components/ui/wallet-button";
 
 export default function Header() {
-  const { connected } = useWallet()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return null
-  }
-
   return (
-    <header className="bg-background border-b">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
-          <Link href="/" className="flex items-center space-x-2">
-            <img 
-              src="https://ucarecdn.com/bbc74eca-8e0d-4147-8a66-6589a55ae8d0/bark.webp" 
-              alt="BARK Logo" 
-              className="w-10 h-10"
-            />
-            <span className="text-2xl font-bold text-primary">BARK</span>
+    <header className="w-full bg-white dark:bg-gray-900 shadow-sm">
+      <div className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <Link href="/" className="flex items-center space-x-2">
+          <Image
+            src="https://ucarecdn.com/bbc74eca-8e0d-4147-8a66-6589a55ae8d0/bark.webp"
+            alt="BARK Logo"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <span className="text-2xl font-bold text-gray-900 dark:text-white">BARK</span>
+        </Link>
+        <nav className="hidden md:flex items-center space-x-8">
+          <Link href="/marketplace" className="text-sm font-medium text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-primary">
+            Marketplace
           </Link>
-          
-          <nav className="flex-grow">
-            <ul className="flex justify-center space-x-6">
-              <li>
-                <Link href="/marketplace" className="flex items-center hover:text-primary transition-colors">
-                  <ShoppingBag className="mr-1" size={18} />
-                  <span>Marketplace</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/staking" className="flex items-center hover:text-primary transition-colors">
-                  <Coins className="mr-1" size={18} />
-                  <span>Staking</span>
-                </Link>
-              </li>
-              {connected && (
-                <li>
-                  <Link href="/profile" className="flex items-center hover:text-primary transition-colors">
-                    <User className="mr-1" size={18} />
-                    <span>Profile</span>
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </nav>
-          
-          <div className="flex items-center space-x-2">
-            <ThemeToggle />
-            <WalletButton />
-          </div>
+          <Link href="/collection" className="text-sm font-medium text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-primary">
+            Collection
+          </Link>
+          <Link href="/about" className="text-sm font-medium text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-primary">
+            About
+          </Link>
+          <Link href="/faq" className="text-sm font-medium text-gray-700 hover:text-primary dark:text-gray-300 dark:hover:text-primary">
+            FAQ
+          </Link>
+        </nav>
+        <div className="flex items-center space-x-4">
+          <ThemeToggle />
+          <WalletButton />
         </div>
       </div>
     </header>
-  )
+  );
 }
 
