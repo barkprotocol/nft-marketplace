@@ -30,8 +30,7 @@ export default function ClaimButton() {
       disabled={isLoading}
       className="w-full text-lg py-6 bg-primary hover:bg-primary/90 text-primary-foreground"
     >
-      {isLoading ? "Claiming..." : "Claim BARK NFT for 3.5 SOL"}
+      {isLoading ? "Claiming..." : "Claim BARK NFT for 3.401 SOL"}
     </Button>
   )
 }
-

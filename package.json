@@ -1,6 +1,6 @@
 {
   "name": "nft-marketplace",
-  "description": "BARK is a decentralized NFT marketplace and staking platform built on the Solana blockchain. It allows users to mint, buy, sell, and stake unique digital assets.",
+  "description": "NFT marketplace and staking platform built on the Solana blockchain. It allows users to customize, mint, buy, sell and stake digital assets.",
   "author": "BARK Protocol",
   "version": "0.1.0",
   "private": true,
@@ -54,6 +54,7 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.8",
     "axios": "^1.7.9",
+    "bignumber.js": "^9.1.2",
     "bs58": "^6.0.0",
     "canvas": "^2.11.2",
     "class-variance-authority": "^0.7.1",

@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 import { 
   PublicKey, 
   Transaction, 
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
-  TransactionInstruction
+  TransactionInstruction,
+  Connection,
+  Signer
 } from '@solana/web3.js';
 import { 
   ASSOCIATED_TOKEN_PROGRAM_ID, 
@@ -15,21 +17,37 @@ import {
 } from "@solana/spl-token";
 import { useMintContext } from '@/app/contexts/mint-context';
 import { toast } from '@/hooks/use-toast';
-import * as anchor from "@coral-xyz/anchor";
+import { AnchorProvider, Program, web3 } from '@coral-xyz/anchor';
 
 const PROGRAM_ID = new PublicKey("BARKxvVHNJkzqGvHVfVJTXKnK6wQvZpfBQKZKUoTDWN4");
 
 const idl = require('@/lib/programs/idl/bark_nft_marketplace.json');
 
+interface MintNFTParams {
+  title: string;
+  description: string;
+  image: string;
+  type: 'standard' | 'compressed';
+  amount: number;
+  fee: number;
+}
+
 export function useMint() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { connection } = useConnection();
-  const wallet = useWallet();
+  const anchorWallet = useAnchorWallet();
   const { claimNFT: updateClaimCount } = useMintContext();
 
-  const mintNFT = useCallback(async (uri: string, title: string) => {
-    if (!wallet.publicKey || !wallet.signTransaction) {
+  const mintNFT = useCallback(async ({
+    title,
+    description,
+    image,
+    type,
+    amount,
+    fee
+  }: MintNFTParams) => {
+    if (!anchorWallet) {
       setError('Wallet not connected');
       return;
     }
@@ -38,18 +56,18 @@ export function useMint() {
     setError(null);
 
     try {
-      const provider = new anchor.AnchorProvider(
+      const provider = new AnchorProvider(
         connection,
-        wallet as anchor.Wallet,
+        anchorWallet,
         { preflightCommitment: 'recent' }
       );
 
-      const program = new anchor.Program(idl, PROGRAM_ID, provider);
+      const program = new Program(idl, PROGRAM_ID, provider);
 
-      const mintKeypair = anchor.web3.Keypair.generate();
+      const mintKeypair = web3.Keypair.generate();
       const tokenAddress = await getAssociatedTokenAddress(
         mintKeypair.publicKey,
-        wallet.publicKey
+        anchorWallet.publicKey
       );
 
       const metadataAddress = (await PublicKey.findProgramAddress(
@@ -75,21 +93,21 @@ export function useMint() {
 
       tx.add(
         SystemProgram.createAccount({
-          fromPubkey: wallet.publicKey,
+          fromPubkey: anchorWallet.publicKey,
           newAccountPubkey: mintKeypair.publicKey,
           space: 82,
           lamports: await connection.getMinimumBalanceForRentExemption(82),
           programId: TOKEN_PROGRAM_ID,
         }),
         createAssociatedTokenAccountInstruction(
-          wallet.publicKey,
+          anchorWallet.publicKey,
           tokenAddress,
-          wallet.publicKey,
+          anchorWallet.publicKey,
           mintKeypair.publicKey
         ),
-        await program.methods.mintNft(wallet.publicKey, uri, title)
+        await program.methods.mintNft(anchorWallet.publicKey, title, description, image, type, amount, fee)
           .accounts({
-            mintAuthority: wallet.publicKey,
+            mintAuthority: anchorWallet.publicKey,
             mint: mintKeypair.publicKey,
             tokenAccount: tokenAddress,
             metadata: metadataAddress,
@@ -102,9 +120,7 @@ export function useMint() {
           .instruction()
       );
 
-      const signature = await wallet.sendTransaction(tx, connection, { signers: [mintKeypair] });
-      await connection.confirmTransaction(signature, 'confirmed');
-
+      const signature = await sendAndConfirmTransaction(connection, tx, [anchorWallet.payer, mintKeypair]);
       console.log(`NFT minted! Signature: ${signature}`);
       updateClaimCount();
 
@@ -124,10 +140,10 @@ export function useMint() {
     } finally {
       setIsLoading(false);
     }
-  }, [wallet, connection, updateClaimCount]);
+  }, [anchorWallet, connection, updateClaimCount]);
 
   const claimNFT = useCallback(async (claimCode: string) => {
-    if (!wallet.publicKey || !wallet.signTransaction) {
+    if (!anchorWallet) {
       setError('Wallet not connected');
       return;
     }
@@ -136,13 +152,13 @@ export function useMint() {
     setError(null);
 
     try {
-      const provider = new anchor.AnchorProvider(
+      const provider = new AnchorProvider(
         connection,
-        wallet as anchor.Wallet,
+        anchorWallet,
         { preflightCommitment: 'recent' }
       );
 
-      const program = new anchor.Program(idl, PROGRAM_ID, provider);
+      const program = new Program(idl, PROGRAM_ID, provider);
 
       // Fetch the mint address associated with the claim code
       const mintAddress = await fetchMintAddressForClaimCode(claimCode);
@@ -153,7 +169,7 @@ export function useMint() {
 
       const tokenAddress = await getAssociatedTokenAddress(
         mintAddress,
-        wallet.publicKey
+        anchorWallet.publicKey
       );
 
       const [claimAccount] = await PublicKey.findProgramAddress(
@@ -166,7 +182,7 @@ export function useMint() {
       tx.add(
         await program.methods.claimNft(claimCode)
           .accounts({
-            claimer: wallet.publicKey,
+            claimer: anchorWallet.publicKey,
             nftMint: mintAddress,
             nftTokenAccount: tokenAddress,
             claimAccount: claimAccount,
@@ -176,9 +192,7 @@ export function useMint() {
           .instruction()
       );
 
-      const signature = await wallet.sendTransaction(tx, connection);
-      await connection.confirmTransaction(signature, 'confirmed');
-
+      const signature = await sendAndConfirmTransaction(connection, tx, [anchorWallet.payer]);
       console.log("NFT claimed! Transaction signature", signature);
 
       toast({
@@ -199,7 +213,7 @@ export function useMint() {
     } finally {
       setIsLoading(false);
     }
-  }, [wallet, connection, updateClaimCount]);
+  }, [anchorWallet, connection, updateClaimCount]);
 
   return {
     mintNFT,
@@ -229,5 +243,14 @@ async function fetchMintAddressForClaimCode(claimCode: string): Promise<PublicKe
     console.error('Error fetching mint address:', error);
     return null;
   }
+}
+
+async function sendAndConfirmTransaction(connection: Connection, transaction: Transaction, signers: Signer[]) {
+  const signature = await web3.sendAndConfirmTransaction(
+    connection,
+    transaction,
+    signers
+  );
+  return signature;
 }
 

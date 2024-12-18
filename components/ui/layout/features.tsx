@@ -86,11 +86,6 @@ export default function Features() {
             </Card>
           ))}
         </div>
-        <div className="mt-12 md:mt-16 text-center">
-          <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 rounded-md font-semibold transition-all duration-300 ease-in-out transform hover:scale-105">
-            Start Creating
-          </Button>
-        </div>
       </div>
     </section>
   );

@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 import { customizeImage } from '@/app/utils/image-customization';
 
 interface ImageCustomizerProps {
@@ -12,31 +13,61 @@ interface ImageCustomizerProps {
   onCustomized: (customizedImageUrl: string) => void;
 }
 
+const googleFonts = [
+  { name: 'Inter', styles: ['Regular', 'semibold', 'Bold'] },
+  { name: 'Roboto', styles: ['Regular', 'Bold', 'Italic'] },
+  { name: 'Open Sans', styles: ['Regular', 'Bold', 'Italic'] },
+  { name: 'Lato', styles: ['Regular', 'Bold', 'Italic'] },
+  { name: 'Montserrat', styles: ['Regular', 'Bold', 'Italic'] },
+  { name: 'Poppins', styles: ['Regular', 'Bold', 'Italic'] },
+];
+
 export function ImageCustomizer({ imageUrl, onCustomized }: ImageCustomizerProps) {
   const [backgroundVariation, setBackgroundVariation] = useState<'default' | 'gradient' | 'pattern'>('default');
-  const [fontFamily, setFontFamily] = useState('Arial');
+  const [fontFamily, setFontFamily] = useState('Inter');
+  const [fontStyle, setFontStyle] = useState('Regular');
   const [fontSize, setFontSize] = useState(20);
-  const [textColor, setTextColor] = useState('#000000');
+  const [textColor, setTextColor] = useState('#010101');
   const [text, setText] = useState('');
+  const [textPosition, setTextPosition] = useState({ x: 50, y: 50 });
 
-  const handleCustomize = async () => {
-    try {
-      const customizedImageUrl = await customizeImage(imageUrl, {
-        backgroundVariation,
-        fontFamily,
-        fontSize,
-        textColor,
-        text,
-      });
-      onCustomized(customizedImageUrl);
-    } catch (error) {
-      console.error('Error customizing image:', error);
-      // You might want to show an error message to the user here
-    }
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href = `https://fonts.googleapis.com/css2?family=${fontFamily.replace(' ', '+')}:wght@400;700&display=swap`;
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, [fontFamily]);
+
+  useEffect(() => {
+    const applyCustomization = async () => {
+      try {
+        const customizedImageUrl = await customizeImage(imageUrl, {
+          backgroundVariation,
+          fontFamily: `${fontFamily} ${fontStyle}`,
+          fontSize,
+          textColor,
+          text,
+          textPosition,
+        });
+        onCustomized(customizedImageUrl);
+      } catch (error) {
+        console.error('Error customizing image:', error);
+      }
+    };
+
+    applyCustomization();
+  }, [imageUrl, backgroundVariation, fontFamily, fontStyle, fontSize, textColor, text, textPosition, onCustomized]);
+
+  const handleTextPositionChange = (axis: 'x' | 'y', value: number) => {
+    setTextPosition(prev => ({ ...prev, [axis]: value }));
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-4 bg-white dark:bg-gray-800 rounded-lg w-full">
       <div>
         <Label htmlFor="background-variation">Background Variation</Label>
         <Select value={backgroundVariation} onValueChange={(value: 'default' | 'gradient' | 'pattern') => setBackgroundVariation(value)}>
@@ -51,22 +82,121 @@ export function ImageCustomizer({ imageUrl, onCustomized }: ImageCustomizerProps
         </Select>
       </div>
       <div>
-        <Label htmlFor="font-family">Font Family</Label>
-        <Input id="font-family" value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} />
+        <Label htmlFor="font-family">Font Family & Style</Label>
+        <Select value={`${fontFamily} ${fontStyle}`} onValueChange={(value) => {
+          const [family, style] = value.split(' ');
+          setFontFamily(family);
+          setFontStyle(style || 'Regular');
+        }}>
+          <SelectTrigger id="font-family">
+            <SelectValue placeholder="Select font family and style" />
+          </SelectTrigger>
+          <SelectContent>
+            {googleFonts.map((font) => (
+              font.styles.map((style) => (
+                <SelectItem key={`${font.name} ${style}`} value={`${font.name} ${style}`}>
+                  <span style={{ fontFamily: font.name, fontWeight: style === 'Bold' ? 'bold' : 'normal', fontStyle: style === 'Italic' ? 'italic' : 'normal' }}>
+                    {font.name} {style}
+                  </span>
+                </SelectItem>
+              ))
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-      <div>
+      <div className="flex justify-between items-center">
         <Label htmlFor="font-size">Font Size</Label>
-        <Input id="font-size" type="number" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} />
+        <span className="text-sm text-gray-500 dark:text-gray-400">{fontSize}px</span>
+      </div>
+      <Slider
+        id="font-size"
+        min={10}
+        max={72}
+        step={1}
+        value={[fontSize]}
+        onValueChange={(value) => setFontSize(value[0])}
+      />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="text">Text</Label>
+          <Input id="text" value={text} onChange={(e) => setText(e.target.value)} />
+        </div>
+        <div>
+          <Label htmlFor="text-color">Text Color</Label>
+          <div className="flex items-center space-x-2">
+            <Input
+              id="text-color"
+              type="color"
+              value={textColor}
+              onChange={(e) => setTextColor(e.target.value)}
+              className="w-12 h-8 p-0 rounded-sm"
+            />
+            <Input
+              type="text"
+              value={textColor}
+              onChange={(e) => setTextColor(e.target.value)}
+              className="flex-grow"
+            />
+          </div>
+        </div>
       </div>
       <div>
-        <Label htmlFor="text-color">Text Color</Label>
-        <Input id="text-color" type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} />
+        <Label>Text Position</Label>
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          <div>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="text-position-x">X</Label>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{textPosition.x}%</span>
+            </div>
+            <Slider
+              id="text-position-x"
+              min={0}
+              max={100}
+              step={1}
+              value={[textPosition.x]}
+              onValueChange={(value) => handleTextPositionChange('x', value[0])}
+            />
+          </div>
+          <div>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="text-position-y">Y</Label>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{textPosition.y}%</span>
+            </div>
+            <Slider
+              id="text-position-y"
+              min={0}
+              max={100}
+              step={1}
+              value={[textPosition.y]}
+              onValueChange={(value) => handleTextPositionChange('y', value[0])}
+            />
+          </div>
+        </div>
       </div>
-      <div>
-        <Label htmlFor="text">Text</Label>
-        <Input id="text" value={text} onChange={(e) => setText(e.target.value)} />
+      <div className="flex justify-between space-x-4 mt-6">
+        <Button 
+          variant="outline" 
+          onClick={() => {
+            setBackgroundVariation('default');
+            setFontFamily('Inter');
+            setFontStyle('Regular');
+            setFontSize(20);
+            setTextColor('#010101');
+            setText('');
+            setTextPosition({ x: 50, y: 50 });
+            onCustomized(imageUrl);
+          }} 
+          className="flex-1 bg-white text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+        >
+          Reset
+        </Button>
+        <Button 
+          onClick={() => onCustomized(imageUrl)} 
+          className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          Apply Changes
+        </Button>
       </div>
-      <Button onClick={handleCustomize}>Apply Customization</Button>
     </div>
   );
 }

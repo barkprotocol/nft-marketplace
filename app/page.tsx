@@ -12,9 +12,6 @@ export default function Home() {
       </section>
       <section aria-label="Mint and Claim" className="py-16 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-8 text-gray-900 dark:text-white">
-            NFT Generator
-          </h2>
           <Minting />
         </div>
       </section>

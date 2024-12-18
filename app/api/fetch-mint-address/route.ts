@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Claim code is required' }, { status: 400 });
     }
 
-    // Fetch the BARK mint address associated with the claim code
+    // Fetch the mint address associated with the claim code
     const claimCodeRecord = await prisma.claimCode.findUnique({
       where: { code: claimCode },
       include: { nft: true },

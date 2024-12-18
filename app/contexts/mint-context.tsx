@@ -26,7 +26,7 @@ export const MintProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (mintedCount < totalSupply) {
       setMintedCount(prev => prev + 1)
     }
-  }, [mintedCount, totalSupply])
+  }, [mintedCount])
 
   return (
     <MintContext.Provider value={{ totalSupply, mintedCount, claimNFT }}>
@@ -34,4 +34,3 @@ export const MintProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </MintContext.Provider>
   )
 }
-
