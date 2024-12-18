@@ -7,14 +7,14 @@ export default function Hero() {
     <section className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-gray-950">
       <Image
         src="https://ucarecdn.com/f6029e68-9768-49db-80a9-64e41e70acff/waveblack.png"
-        alt="Background"
-        layout="fill"
-        objectFit="cover"
-        quality={95}
+        alt="Abstract wave background"
+        fill
+        sizes="100vw"
+        quality={85}
         priority
-        className="object-center"
+        className="object-cover object-center"
       />
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+      <div className="absolute inset-0 bg-black bg-opacity-60" aria-hidden="true"></div>
       <div className="relative z-10 container mx-auto px-4 py-12 text-center text-white">
         <h2 className="text-sm sm:text-base md:text-lg font-semibold mb-4 bg-gradient-to-r from-[#d0c8b9] to-[#c5bdae] text-transparent bg-clip-text">
           Empowering Digital Art
@@ -30,11 +30,10 @@ export default function Hero() {
             <Link href="/marketplace">Explore Marketplace</Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="shadow-lg hover:shadow-xl transition-shadow bg-white bg-opacity-20 hover:bg-opacity-30">
-            <Link href="/create">Create NFT</Link>
+            <Link href="/claim">Claim NFT</Link>
           </Button>
         </div>
       </div>
     </section>
   );
 }
-

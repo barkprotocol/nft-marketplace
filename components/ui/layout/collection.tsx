@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { NFTCard } from "@/components/ui/nft-card";
 import { Button } from "@/components/ui/button";
@@ -26,10 +26,24 @@ const nfts = [
 
 export default function Collection() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const cardsPerPage = 8;
+  const totalPages = Math.ceil(nfts.length / cardsPerPage);
+
+  useEffect(() => {
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
   const currentCards = nfts.slice(indexOfFirstCard, indexOfLastCard);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <section className="py-12 md:py-16 bg-gray-100 dark:bg-gray-900">
@@ -42,29 +56,35 @@ export default function Collection() {
             Discover exclusive BARK NFTs, each a unique piece of digital art showcasing our community's creativity.
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
-          {currentCards.map((nft) => (
-            <Link key={nft.id} href={`/nft/${nft.id}`} passHref>
-              <NFTCard nft={nft} />
-            </Link>
-          ))}
-        </div>
-        <div className="flex justify-center mt-8">
-          <Button
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-            className="mx-2"
-          >
-            1
-          </Button>
-          <Button
-            onClick={() => setCurrentPage(2)}
-            disabled={currentPage === 2}
-            className="mx-2"
-          >
-            2
-          </Button>
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+              {currentCards.map((nft) => (
+                <Link key={nft.id} href={`/nft/${nft.id}`} passHref>
+                  <NFTCard nft={nft} />
+                </Link>
+              ))}
+            </div>
+            <nav className="flex justify-center mt-8" aria-label="Pagination">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <Button
+                  key={i + 1}
+                  onClick={() => paginate(i + 1)}
+                  disabled={currentPage === i + 1}
+                  className="mx-2"
+                  aria-label={`Go to page ${i + 1}`}
+                  aria-current={currentPage === i + 1 ? "page" : undefined}
+                >
+                  {i + 1}
+                </Button>
+              ))}
+            </nav>
+          </>
+        )}
       </div>
     </section>
   );

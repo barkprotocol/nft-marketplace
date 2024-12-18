@@ -1,0 +1,337 @@
+{
+    "version": "0.1.0",
+    "name": "bark_nft_marketplace",
+    "instructions": [
+      {
+        "name": "initializeMarketplace",
+        "accounts": [
+          {
+            "name": "authority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "marketplaceAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "fee",
+            "type": "u64"
+          }
+        ]
+      },
+      {
+        "name": "mintNft",
+        "accounts": [
+          {
+            "name": "mintAuthority",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "mint",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "metadata",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "masterEdition",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenMetadataProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "rent",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "creatorKey",
+            "type": "publicKey"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "title",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "name": "listNft",
+        "accounts": [
+          {
+            "name": "owner",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "nftMint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "nftTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "marketplaceAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "listingAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "rent",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "price",
+            "type": "u64"
+          }
+        ]
+      },
+      {
+        "name": "cancelListing",
+        "accounts": [
+          {
+            "name": "owner",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "nftMint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "nftTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "listingAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "buyNft",
+        "accounts": [
+          {
+            "name": "buyer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "seller",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "nftMint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "nftTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "buyerTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "marketplaceAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "listingAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": []
+      },
+      {
+        "name": "claimNft",
+        "accounts": [
+          {
+            "name": "claimer",
+            "isMut": true,
+            "isSigner": true
+          },
+          {
+            "name": "nftMint",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "nftTokenAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "claimAccount",
+            "isMut": true,
+            "isSigner": false
+          },
+          {
+            "name": "tokenProgram",
+            "isMut": false,
+            "isSigner": false
+          },
+          {
+            "name": "systemProgram",
+            "isMut": false,
+            "isSigner": false
+          }
+        ],
+        "args": [
+          {
+            "name": "claimCode",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "accounts": [
+      {
+        "name": "MarketplaceAccount",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "authority",
+              "type": "publicKey"
+            },
+            {
+              "name": "fee",
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "ListingAccount",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "owner",
+              "type": "publicKey"
+            },
+            {
+              "name": "nftMint",
+              "type": "publicKey"
+            },
+            {
+              "name": "price",
+              "type": "u64"
+            }
+          ]
+        }
+      },
+      {
+        "name": "ClaimAccount",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "claimer",
+              "type": "publicKey"
+            },
+            {
+              "name": "nftMint",
+              "type": "publicKey"
+            },
+            {
+              "name": "claimCode",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "InvalidClaimCode",
+        "msg": "The provided claim code is invalid"
+      }
+    ]
+  }
+  
+  

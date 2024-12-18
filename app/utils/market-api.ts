@@ -9,7 +9,7 @@ interface MarketPrice {
     await new Promise(resolve => setTimeout(resolve, 1000));
   
     // Simulating different prices from each source
-    const basePrice = Math.random() * 250 + 799; // Random price between 250 and 799
+    const basePrice = Math.random() * 100 + 50; // Random price between 50 and 150
     return {
       coinmarketcap: parseFloat((basePrice * 0.99).toFixed(2)),
       coingecko: parseFloat((basePrice * 1.01).toFixed(2)),

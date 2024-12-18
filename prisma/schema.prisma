@@ -1,7 +1,6 @@
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -9,48 +8,43 @@ generator client {
 }
 
 model User {
+  id            String   @id @default(cuid())
+  publicKey     String   @unique
+  barkTokens    BarkToken[]
+  nfts          NFT[]
+  socialAccounts SocialAccount[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model BarkToken {
   id        String   @id @default(cuid())
-  publicKey String   @unique
-  username  String?
-  nfts      NFT[]
-  balance   Float    @default(0)
+  amount    Float
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model NFT {
-  id          String   @id @default(cuid())
-  mintAddress String   @unique
-  name        String
-  description String?
-  image       String
-  metadataUri String
-  owner       User     @relation(fields: [ownerId], references: [id])
-  ownerId     String
-  price       Float?
-  isListed    Boolean  @default(false)
-  isStaked    Boolean  @default(false)
-  stakedAt    DateTime?
-  rewards     Float    @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Transaction {
   id        String   @id @default(cuid())
-  nftId     String
-  sellerId  String
-  buyerId   String
-  price     Float
-  timestamp DateTime @default(now())
-  transactionSignature String
+  tokenId   String   @unique
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String
+  claimedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model RewardsClaim {
-  id        String   @id @default(cuid())
-  userId    String
-  nftId     String
-  amount    Float
-  timestamp DateTime @default(now())
-}
+model SocialAccount {
+  id            String   @id @default(cuid())
+  platform      String   // e.g., "twitter", "discord", "telegram"
+  accountId     String   // The user's ID on the platform
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  isFollowing   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
+  @@unique([platform, accountId])
+}

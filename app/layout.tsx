@@ -4,6 +4,7 @@ import "./styles/globals.css";
 import Header from '@/components/ui/layout/header';
 import Footer from "@/components/ui/layout/footer";
 import { WalletContextProvider } from '@/components/providers/wallet-provider';
+import { MintProvider } from '@/app/contexts/mint-context';
 
 const syne = Syne({ subsets: ["latin"], variable: '--font-syne' });
 const poppins = Poppins({ weight: ["400", "600"], subsets: ["latin"], variable: '--font-poppins' });
@@ -23,14 +24,17 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <WalletContextProvider>
-            <Header />
-            <main className="flex-grow w-full">
-              {children}
-            </main>
-            <Footer />
+            <MintProvider>
+              <Header />
+              <main className="flex-grow w-full">
+                {children}
+              </main>
+              <Footer />
+            </MintProvider>
           </WalletContextProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
+
