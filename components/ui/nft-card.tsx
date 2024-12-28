@@ -21,9 +21,14 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
 
   useEffect(() => {
     const fetchUSDCPrice = async () => {
-      const solPrice = parseFloat(nft.price);
-      const usdcAmount = await convertSOLtoUSDC(solPrice);
-      setUsdcPrice(usdcAmount.toFixed(2));
+      try {
+        const solPrice = parseFloat(nft.price);
+        const usdcAmount = await convertSOLtoUSDC(solPrice);
+        setUsdcPrice(usdcAmount.toFixed(2));
+      } catch (error) {
+        console.error("Error fetching USDC price:", error);
+        setUsdcPrice(null); // Optionally handle errors here
+      }
     };
 
     fetchUSDCPrice();
@@ -61,6 +66,7 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
           <Button 
             className="w-full bg-primary text-primary-foreground text-xs rounded-sm"
             onClick={() => console.log(`Minting NFT: ${nft.title}`)}
+            aria-label={`Mint ${nft.title}`}
           >
             Mint
           </Button>
@@ -68,6 +74,7 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
             className="w-full text-xs rounded-sm"
             variant="outline"
             onClick={() => console.log(`View details: ${nft.title}`)}
+            aria-label={`View details of ${nft.title}`}
           >
             Details
           </Button>
@@ -76,4 +83,3 @@ export const NFTCard: React.FC<NFTCardProps> = ({ nft }) => {
     </Card>
   );
 };
-

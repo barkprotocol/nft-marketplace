@@ -30,12 +30,12 @@ export default function Profile() {
   const { user } = useWalletContext()
   const [userNfts, setUserNfts] = useState<NFT[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    async function fetchUserData() {
       if (user) {
         setIsLoading(true)
         setError(null)
@@ -73,14 +73,16 @@ export default function Profile() {
     fetchUserData()
   }, [user, toast])
 
-  const handleListNFT = async (_nftId: string) => {
+  const handleListNFT = async (nftId: string) => {
+    // Implement NFT listing logic here
     toast({
       title: "NFT Listing",
       description: "NFT listing functionality is not implemented yet.",
     })
   }
 
-  const handleUnlistNFT = async (_nftId: string) => {
+  const handleUnlistNFT = async (nftId: string) => {
+    // Implement NFT unlisting logic here
     toast({
       title: "NFT Unlisting",
       description: "NFT unlisting functionality is not implemented yet.",
@@ -103,7 +105,6 @@ export default function Profile() {
     return (
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
-        <p>Fetching your NFTs and transaction history...</p>
         <Loader2 className="h-8 w-8 animate-spin mx-auto" />
       </div>
     )
@@ -168,7 +169,7 @@ export default function Profile() {
                 href={`https://explorer.solana.com/tx/${tx.transactionSignature}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-yellow-500 hover:underline flex items-center mt-2"
+                className="text-gray-500 hover:underline flex items-center mt-2"
               >
                 View on Solana Explorer
                 <ExternalLink className="ml-1 h-4 w-4" />

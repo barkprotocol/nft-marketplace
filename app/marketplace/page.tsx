@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { useWalletConnection } from '@/hooks/use-wallet-connection'
+import { useWalletContext } from '@/hooks/use-wallet-context'
 import { getProgram, createMintNFTTransaction, sendAndConfirmTransaction } from '@/app/utils/anchor'
 import { useAnchorWallet } from '@solana/wallet-adapter-react'
 import { useToast } from "@/hooks/use-toast"
@@ -27,8 +27,8 @@ export default function Marketplace() {
   const [isLoading, setIsLoading] = useState(true)
   const [isMinting, setIsMinting] = useState(false)
   const [mintDialogOpen, setMintDialogOpen] = useState(false)
-  const { connected, publicKey, signTransaction } = useWallet()
-  const { user } = useWalletConnection()
+  const { connected, publicKey, signTransaction, disconnect } = useWallet() // added disconnect here
+  const { user } = useWalletContext()
   const anchorWallet = useAnchorWallet()
   const { toast } = useToast()
 
@@ -46,12 +46,24 @@ export default function Marketplace() {
       toast({
         title: "Error",
         description: "Failed to load NFTs. Please try again.",
-        variant: "destructive",
+        variant: "default", // Changed to default
+        "aria-live": "assertive", // Ensuring the toast is announced for screen readers
       })
     } finally {
       setIsLoading(false)
     }
   }, [toast])
+
+  useEffect(() => {
+    if (!connected) {
+      toast({
+        title: "Wallet Disconnected",
+        description: "Your wallet has been disconnected. Please reconnect to continue.",
+        variant: "default", // Changed to default
+        "aria-live": "assertive",
+      })
+    }
+  }, [connected, toast]) // Added listener for wallet disconnect
 
   useEffect(() => {
     fetchNFTs()
@@ -63,6 +75,7 @@ export default function Marketplace() {
         title: "Wallet not connected",
         description: "Please connect your wallet to purchase NFTs.",
         variant: "destructive",
+        "aria-live": "assertive", // Ensuring the toast is announced for screen readers
       })
       return
     }
@@ -89,6 +102,7 @@ export default function Marketplace() {
       toast({
         title: "Purchase successful",
         description: `You have successfully purchased the NFT! Transaction signature: ${data.transactionSignature}`,
+        "aria-live": "assertive",
       })
 
       await fetchNFTs()
@@ -98,6 +112,7 @@ export default function Marketplace() {
         title: "Purchase failed",
         description: "There was an error while purchasing the NFT. Please try again.",
         variant: "destructive",
+        "aria-live": "assertive",
       })
     }
   }
@@ -108,6 +123,7 @@ export default function Marketplace() {
         title: "Wallet not connected",
         description: "Please connect your wallet to mint NFTs.",
         variant: "destructive",
+        "aria-live": "assertive",
       })
       return
     }
@@ -117,6 +133,17 @@ export default function Marketplace() {
       const name = formData.get('name') as string
       const description = formData.get('description') as string
       const image = formData.get('image') as File
+
+      // Validate form data
+      if (!name || !description || !image) {
+        toast({
+          title: "Invalid form data",
+          description: "Please ensure all fields are filled out correctly.",
+          variant: "destructive",
+          "aria-live": "assertive",
+        })
+        return
+      }
 
       // Store NFT metadata on IPFS
       const metadataUri = await storeNFT(image, name, description, [])
@@ -140,6 +167,7 @@ export default function Marketplace() {
       toast({
         title: "NFT Minted",
         description: `Successfully minted NFT with address: ${mint.publicKey.toString()}`,
+        "aria-live": "assertive",
       })
       
       await fetchNFTs()
@@ -150,6 +178,7 @@ export default function Marketplace() {
         title: "Minting failed",
         description: "There was an error while minting the NFT. Please try again.",
         variant: "destructive",
+        "aria-live": "assertive",
       })
     } finally {
       setIsMinting(false)
@@ -178,13 +207,12 @@ export default function Marketplace() {
         <Dialog open={mintDialogOpen} onOpenChange={setMintDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-primary text-primary-foreground" disabled={!connected}>
-              <Plus className="mr-2" size={18} />
-              Mint New NFT
+              <Plus className="mr-2 h-5 w-5" /> Mint New NFT
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Mint a New NFT</DialogTitle>
+              <DialogTitle>Mint New NFT</DialogTitle>
             </DialogHeader>
             <NFTMintForm onSubmit={handleMint} isLoading={isMinting} />
           </DialogContent>
@@ -206,4 +234,3 @@ export default function Marketplace() {
     </div>
   )
 }
-

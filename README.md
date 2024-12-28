@@ -6,6 +6,32 @@ BARK Protocol’s NFT marketplace and staking platform is built on the Solana bl
 
 ---
 
+## Frontend
+
+The frontend is a Next.js application written in TypeScript. It includes key components and pages for wallet integration, NFT marketplace, staking, and rewards claiming. The frontend communicates with the Solana blockchain using the Solana Web3.js library.
+
+### Core Components
+
+**Wallet Context:**
+- Manages wallet connections and disconnections using the `@solana/wallet-adapter-react` library.
+- Provides a context to share the wallet state across the application.
+- Supports Phantom, Solflare, and Backpack wallets.
+
+**NFT Staking Page:**
+- Allows users to stake NFTs to earn rewards.
+- Users connect their wallet, input the NFT mint address, and stake the NFT.
+- A mock transaction is sent to the Solana blockchain as a placeholder for actual staking logic.
+
+**Claim Rewards Page:**
+- Allows users to claim rewards accumulated from staked NFTs.
+- Rewards are transferred back to the user’s wallet in the form of fungible tokens.
+
+**Wallet Connection Management:**
+- Provides an interface for users to connect and disconnect from their wallets.
+- Displays the wallet address once connected.
+
+---
+
 ## Features
 
 - **Mint Compressed NFTs or Standard NFTs**
@@ -14,6 +40,14 @@ BARK Protocol’s NFT marketplace and staking platform is built on the Solana bl
 - **User Profiles**: View owned NFTs and transaction history
 - **Wallet Integration**: Supports Solflare, Metamask, Phantom, and Backpack
 - **Responsive Design**: Built with Tailwind CSS and Shadcn/ui components
+
+---
+
+## NFT Staking System
+
+The BARK NFT Staking System allows users to stake their NFTs, earn rewards in fungible tokens, and interact with the Solana blockchain through a simple, user-friendly web interface built with Next.js and TypeScript.
+
+This system supports Solana wallet integrations (e.g., Phantom, Solflare, Backpack) and utilizes the Solana Web3.js library to manage blockchain interactions. The architecture is designed to be scalable, modular, and highly interactive, offering features such as staking NFTs, claiming rewards, and wallet integration.
 
 ---
 
@@ -72,6 +106,26 @@ BARK Protocol’s NFT marketplace and staking platform is built on the Solana bl
 
 ---
 
+## Architecture
+
+### Solana Blockchain Integration:
+- **Solana Web3.js** is used for interacting with the Solana blockchain, allowing the frontend to mint NFTs, send transactions, and stake NFTs.
+- **Anchor Framework** is employed for building smart contracts (programs) on Solana.
+  
+### Backend:
+- The backend utilizes **Supabase** for storing user data and NFT metadata. Prisma ORM is used to interact with the PostgreSQL database.
+- The **Anchor Program** handles NFT minting, staking, and rewards logic directly on the Solana blockchain.
+
+### Staking and Rewards:
+- NFTs can be staked to earn rewards, which are fungible tokens sent back to the user's wallet.
+- Staking is handled via smart contracts deployed on the Solana blockchain.
+  
+### User Experience:
+- The frontend is built using **Next.js** with **TypeScript** for type safety and **Tailwind CSS** for responsive design.
+- **Shadcn/ui components** are used to simplify UI development and ensure consistency across the platform.
+
+---
+
 ## Technologies Used
 
 - **Next.js** 15.1.0 with App Router
@@ -89,7 +143,7 @@ BARK Protocol’s NFT marketplace and staking platform is built on the Solana bl
 
 ## Prerequisites
 
-- Node.js (v16 or later)
+- Node.js (v18 or later)
 - npm, pnpm, or yarn
 - Solana CLI tools
 - A Solana wallet (e.g., Solflare, Metamask, Phantom, Backpack)
@@ -196,6 +250,13 @@ We welcome contributions! Fork the repository and submit a pull request to help 
 
 ---
 
+## Documentation
+
+![Project documentation]:(/document)
+
+---
+
 ## License
 
 This project is licensed under the **MIT License**.
+```

@@ -4,7 +4,7 @@ import "./styles/globals.css";
 import Header from '@/components/ui/layout/header';
 import Footer from "@/components/ui/layout/footer";
 import { WalletContextProvider } from '@/components/providers/wallet-provider';
-import { MintProvider } from '@/app/contexts/mint-context';
+import { MintProvider } from '@/app/context/mint-context';
 
 const syne = Syne({ subsets: ["latin"], variable: '--font-syne' });
 const poppins = Poppins({ weight: ["400", "600"], subsets: ["latin"], variable: '--font-poppins' });

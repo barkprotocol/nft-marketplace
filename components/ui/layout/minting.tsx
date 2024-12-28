@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, Upload, Download, AlertTriangle } from 'lucide-react'
-import { useMint } from "@/hooks/use-mint"
+import { useMint } from "@/hooks/use-mint-nft"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { NFTTermsCard } from "@/components/ui/nft-terms-card"

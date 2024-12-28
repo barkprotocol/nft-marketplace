@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 interface NFTMintFormProps {
   onSubmit: (formData: FormData) => Promise<void>
@@ -14,6 +15,7 @@ interface NFTMintFormProps {
 
 export function NFTMintForm({ onSubmit, isLoading }: NFTMintFormProps) {
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -21,7 +23,16 @@ export function NFTMintForm({ onSubmit, isLoading }: NFTMintFormProps) {
     if (imageFile) {
       formData.set('image', imageFile)
     }
-    await onSubmit(formData)
+
+    try {
+      await onSubmit(formData)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was an issue submitting the form. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,6 +61,7 @@ export function NFTMintForm({ onSubmit, isLoading }: NFTMintFormProps) {
           onChange={handleImageChange}
           required 
         />
+        {imageFile && <p className="text-sm text-muted-foreground mt-2">{imageFile.name}</p>}
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (
@@ -64,4 +76,3 @@ export function NFTMintForm({ onSubmit, isLoading }: NFTMintFormProps) {
     </form>
   )
 }
-

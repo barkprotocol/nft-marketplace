@@ -28,7 +28,12 @@ export function ImageOverview({ imageUrl, onDownload }: ImageOverviewProps) {
             <p className="text-gray-500 dark:text-gray-400">No image uploaded</p>
           </div>
         )}
-        <Button onClick={onDownload} disabled={!imageUrl} className="mt-4">
+        <Button 
+          onClick={onDownload} 
+          disabled={!imageUrl} 
+          className="mt-4"
+          aria-label={imageUrl ? "Download image" : "Image not available to download"}
+        >
           <Download className="w-4 h-4 mr-2" />
           Download Image
         </Button>
@@ -36,5 +41,3 @@ export function ImageOverview({ imageUrl, onDownload }: ImageOverviewProps) {
     </Card>
   )
 }
-
-

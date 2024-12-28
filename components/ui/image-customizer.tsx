@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { customizeImage } from '@/app/utils/image-customization';
+import { debounce } from 'lodash';
 
 interface ImageCustomizerProps {
   imageUrl: string;
@@ -42,28 +43,39 @@ export function ImageCustomizer({ imageUrl, onCustomized }: ImageCustomizerProps
     };
   }, [fontFamily]);
 
-  useEffect(() => {
-    const applyCustomization = async () => {
-      try {
-        const customizedImageUrl = await customizeImage(imageUrl, {
-          backgroundVariation,
-          fontFamily: `${fontFamily} ${fontStyle}`,
-          fontSize,
-          textColor,
-          text,
-          textPosition,
-        });
-        onCustomized(customizedImageUrl);
-      } catch (error) {
-        console.error('Error customizing image:', error);
-      }
-    };
+  const applyCustomization = debounce(async () => {
+    try {
+      const customizedImageUrl = await customizeImage(imageUrl, {
+        backgroundVariation,
+        fontFamily: `${fontFamily} ${fontStyle}`,
+        fontSize,
+        textColor,
+        text,
+        textPosition,
+      });
+      onCustomized(customizedImageUrl);
+    } catch (error) {
+      console.error('Error customizing image:', error);
+    }
+  }, 500); // Debounced call to prevent too many requests
 
+  useEffect(() => {
     applyCustomization();
-  }, [imageUrl, backgroundVariation, fontFamily, fontStyle, fontSize, textColor, text, textPosition, onCustomized]);
+  }, [imageUrl, backgroundVariation, fontFamily, fontStyle, fontSize, textColor, text, textPosition]);
 
   const handleTextPositionChange = (axis: 'x' | 'y', value: number) => {
     setTextPosition(prev => ({ ...prev, [axis]: value }));
+  };
+
+  const resetCustomization = () => {
+    setBackgroundVariation('default');
+    setFontFamily('Inter');
+    setFontStyle('Regular');
+    setFontSize(20);
+    setTextColor('#010101');
+    setText('');
+    setTextPosition({ x: 50, y: 50 });
+    onCustomized(imageUrl); // Keep the original image URL when reset
   };
 
   return (
@@ -176,16 +188,7 @@ export function ImageCustomizer({ imageUrl, onCustomized }: ImageCustomizerProps
       <div className="flex justify-between space-x-4 mt-6">
         <Button 
           variant="outline" 
-          onClick={() => {
-            setBackgroundVariation('default');
-            setFontFamily('Inter');
-            setFontStyle('Regular');
-            setFontSize(20);
-            setTextColor('#010101');
-            setText('');
-            setTextPosition({ x: 50, y: 50 });
-            onCustomized(imageUrl);
-          }} 
+          onClick={resetCustomization} 
           className="flex-1 bg-white text-gray-900 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
         >
           Reset
@@ -200,4 +203,3 @@ export function ImageCustomizer({ imageUrl, onCustomized }: ImageCustomizerProps
     </div>
   );
 }
-

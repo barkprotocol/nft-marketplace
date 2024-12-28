@@ -6,6 +6,7 @@ interface MintContextType {
   totalSupply: number
   mintedCount: number
   claimNFT: () => void
+  canClaim: boolean // Whether the user can claim more NFTs
 }
 
 const MintContext = createContext<MintContextType | undefined>(undefined)
@@ -22,14 +23,20 @@ export const MintProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [mintedCount, setMintedCount] = useState(0)
   const totalSupply = 5000
 
+  // Check if user can claim more NFTs
+  const canClaim = mintedCount < totalSupply
+
   const claimNFT = useCallback(() => {
-    if (mintedCount < totalSupply) {
+    if (canClaim) {
       setMintedCount(prev => prev + 1)
+      // You can also add any additional logic here such as calling an API to mint the NFT
+    } else {
+      console.log('Total supply reached. No more NFTs can be minted.');
     }
-  }, [mintedCount])
+  }, [mintedCount, canClaim])
 
   return (
-    <MintContext.Provider value={{ totalSupply, mintedCount, claimNFT }}>
+    <MintContext.Provider value={{ totalSupply, mintedCount, claimNFT, canClaim }}>
       {children}
     </MintContext.Provider>
   )

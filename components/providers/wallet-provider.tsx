@@ -7,20 +7,21 @@ import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adap
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
 
-// Default styles that can be overridden by dapp
+// Import default styles for wallet modal
 require('@solana/wallet-adapter-react-ui/styles.css');
 
-interface Props {
+interface WalletContextProviderProps {
   children: ReactNode;
 }
 
-export const WalletContextProvider: FC<Props> = ({ children }) => {
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'
+export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children }) => {
+  // Define the network (devnet, testnet, or mainnet-beta)
   const network = WalletAdapterNetwork.Devnet;
 
-  // You can also provide a custom RPC endpoint
+  // Provide the RPC endpoint for the specified network
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
+  // Initialize wallet adapters for Phantom and Solflare
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
@@ -32,7 +33,9 @@ export const WalletContextProvider: FC<Props> = ({ children }) => {
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
+        <WalletModalProvider>
+          {children}
+        </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
   );
